@@ -1,4 +1,4 @@
-package de.florianbrucker.keyboard;
+package de.florianbrucker.chainboard;
 
 import java.util.Collection;
 
@@ -8,7 +8,7 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.EditText;
 
-public class ChainingTouchListener implements OnTouchListener {
+public class ChainedTouchListener implements OnTouchListener {
 	
 	public interface ChainedTouchEventListener {
 		public void onChainedTouchEvent(int i);

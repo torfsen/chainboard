@@ -1,12 +1,11 @@
-package de.florianbrucker.keyboard;
+package de.florianbrucker.chainboard;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import de.florianbrucker.keyboard.ChainingTouchListener.ChainedTouchEventListener;
+import de.florianbrucker.chainboard.ChainedTouchListener.ChainedTouchEventListener;
 
 public class MainActivity extends Activity implements ChainedTouchEventListener {
 	
@@ -17,7 +16,7 @@ public class MainActivity extends Activity implements ChainedTouchEventListener 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		ChainingTouchListener touchListener = new ChainingTouchListener();
+		ChainedTouchListener touchListener = new ChainedTouchListener();
 		touchListener.addListener(this);
 		
 		((Button) findViewById(R.id.button1)).setOnTouchListener(touchListener);
@@ -37,11 +36,6 @@ public class MainActivity extends Activity implements ChainedTouchEventListener 
 	}
 	
 	
-	public void buttonClick(View v) {
-		EditText text = (EditText) findViewById(R.id.text);
-		text.getText().append("foo ");
-	}
-
 	@Override
 	public void onChainedTouchEvent(int i) {
 		EditText text = (EditText) findViewById(R.id.text);
