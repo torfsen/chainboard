@@ -58,12 +58,13 @@ public class ChainedLinearLayout extends LinearLayout {
 		
 		int action = MotionEventCompat.getActionMasked(event);
 		int index = MotionEventCompat.getActionIndex(event);
+		int id = MotionEventCompat.getPointerId(event, index);
 		
 		final String DEBUG_TAG = "KEYBOARD";
 		
 		if (action != MotionEvent.ACTION_MOVE){
-			Log.d(DEBUG_TAG,Integer.toString(action) + ","+Integer.toString(index));
-			Log.d(DEBUG_TAG,Integer.toString(state.currentlyDown));
+			Log.d(DEBUG_TAG, action + "," + index + ", " + id);
+			//Log.d(DEBUG_TAG,Integer.toString(state.currentlyDown));
 		}
 		
 		if (action == MotionEvent.ACTION_DOWN || action == MotionEventCompat.ACTION_POINTER_DOWN) {
