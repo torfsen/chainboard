@@ -18,7 +18,8 @@
         android:ems="10"
         android:inputType="textMultiLine" />
 
-    <LinearLayout
+    <de.florianbrucker.chainboard.ChainedLinearLayout
+        android:id="@+id/buttongroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="16dp" >
@@ -33,21 +34,18 @@
                 android:id="@+id/button1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="buttonClick"
                 android:text="Button" />
 
             <Button
                 android:id="@+id/button2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="buttonClick"
                 android:text="Button" />
 
             <Button
                 android:id="@+id/button3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="buttonClick"
                 android:text="Button" />
 
         </LinearLayout>
@@ -62,23 +60,20 @@
                 android:id="@+id/button4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button"
-                android:onClick="buttonClick"/>
+                android:text="Button" />
 
             <Button
                 android:id="@+id/button5"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button"
-                android:onClick="buttonClick"/>
+                android:text="Button" />
 
             <Button
                 android:id="@+id/button6"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Button"
-                android:onClick="buttonClick"/>
+                android:text="Button" />
         </LinearLayout>
-    </LinearLayout>
+    </de.florianbrucker.chainboard.ChainedLinearLayout>
 
 </LinearLayout>
