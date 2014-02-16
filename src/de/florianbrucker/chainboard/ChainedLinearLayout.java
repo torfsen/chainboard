@@ -11,6 +11,8 @@ import android.widget.LinearLayout;
 
 public class ChainedLinearLayout extends LinearLayout {
 	
+	final String DEBUG_TAG = "KEYBOARD";
+	
 	public interface ChainedTouchEventListener {
 		public void onChainedTouchEvent(int i);
 	}
@@ -59,27 +61,14 @@ public class ChainedLinearLayout extends LinearLayout {
 		int action = MotionEventCompat.getActionMasked(event);
 		int index = MotionEventCompat.getActionIndex(event);
 		int id = MotionEventCompat.getPointerId(event, index);
-		
-		final String DEBUG_TAG = "KEYBOARD";
-		
-		if (action != MotionEvent.ACTION_MOVE){
-			Log.d(DEBUG_TAG, action + "," + index + ", " + id);
-			//Log.d(DEBUG_TAG,Integer.toString(state.currentlyDown));
-		}
-		
+
 		if (action == MotionEvent.ACTION_DOWN || action == MotionEventCompat.ACTION_POINTER_DOWN) {
-			state.currentlyDown++;
-			state.chainLength++;
+			Log.d("FOO", "DOWN (" + id + ")");
 		} else if (action == MotionEvent.ACTION_UP || action == MotionEventCompat.ACTION_POINTER_UP) {
-			state.currentlyDown--;
-			if (state.currentlyDown == 0) {
-				fireEvent(state.chainLength);
-				state.chainLength = 0;
-			}
+			Log.d("FOO", "UP (" + id + ")");	
 		}
 		
 		return true;
-		
 	}
 
 }
