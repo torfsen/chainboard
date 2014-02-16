@@ -3,11 +3,10 @@ package de.florianbrucker.chainboard;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import de.florianbrucker.chainboard.StateMachine.StateChangeListener;
 
-public class MainActivity extends Activity implements StateChangeListener {
+public class MainActivity extends Activity {
 	
 	final static String DEBUG_TAG = "KEYBOARD_DEBUG";
 
@@ -16,8 +15,9 @@ public class MainActivity extends Activity implements StateChangeListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		StateMachine machine = new StateMachine();
-		machine.setStateChangeListener(this);
+		View text = findViewById(R.id.text);
+		TransitionTable table = new TransitionTable(text);
+		StateMachine machine = new StateMachine(table);
 		
 		MotionEventConverter touchListener = new MotionEventConverter();
 		touchListener.addListener(machine);
@@ -35,14 +35,6 @@ public class MainActivity extends Activity implements StateChangeListener {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
-	}
-	
-	
-	@Override
-	public State onStateChange(State s) {
-		EditText text = (EditText) findViewById(R.id.text);
-		text.append(s.getId() + "\n");
-		return s;
 	}
 	
 }

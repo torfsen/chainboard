@@ -1,36 +1,34 @@
 package de.florianbrucker.chainboard;
 
+import android.util.Log;
+
 public class StateMachine implements MotionEventConverter.TouchEventListener {
 	
-	public interface StateChangeListener {
-		public State onStateChange(State s);
+	final static String TAG = "StateMachine";
+	
+	public interface TransitionFunction {
+		public State transition(State oldState, TouchEvent event);
 	}
 	
-	public void setStateChangeListener(StateChangeListener listener) {
-		this.listener = listener;
-	}
-	
-	StateChangeListener listener = null;
+	TransitionFunction transitionFunction = null;
 	
 	State state = null;
 	
-	public StateMachine(State state) {
+	public StateMachine(TransitionFunction transitionFunction, State state) {
+		this.transitionFunction = transitionFunction;
 		this.state = state;
 	}
 	
-	public StateMachine() {
+	public StateMachine(TransitionFunction transitionFunction) {
+		this.transitionFunction = transitionFunction;
 		this.state = State.NULL_STATE;
-	}
-	
-	void fireEvent() {
-		if (listener != null) {
-			state = listener.onStateChange(state);			
-		}
 	}
 	
 	@Override
 	public void onTouchEvent(TouchEvent e) {
-		state = state.transition(e);
-		fireEvent();
+		Log.d(TAG, "Received TouchEvent " + e);
+		Log.d(TAG, "Current state is " + state);
+		state = transitionFunction.transition(state, e);
+		Log.d(TAG, "New state is " + state);
 	}
 }
