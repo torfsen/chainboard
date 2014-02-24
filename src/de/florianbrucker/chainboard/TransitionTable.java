@@ -92,7 +92,7 @@ public class TransitionTable implements TransitionFunction {
 	}
 
 	@Override
-	public State transition(State oldState, TouchEvent event) {
+	public State transition(State oldState, ButtonEvent event) {
 		Key key = new Key(oldState, event.buttonId);
 		if (!table.containsKey(key)) {
 			pressKey(KeyEvent.KEYCODE_ENTER);

@@ -1,7 +1,7 @@
 package de.florianbrucker.chainboard;
 
 
-public class TouchEvent {
+public class ButtonEvent {
 	
 	public static enum Direction {
 		UP("UP"), DOWN("DOWN");
@@ -21,7 +21,7 @@ public class TouchEvent {
 	final int buttonId;
 	final Direction direction;
 	
-	public TouchEvent(int buttonId, Direction direction) {
+	public ButtonEvent(int buttonId, Direction direction) {
 		this.buttonId = buttonId;
 		this.direction = direction;
 	}
@@ -42,9 +42,9 @@ public class TouchEvent {
 			return true;
 		if (obj == null)
 			return false;
-		if (!(obj instanceof TouchEvent))
+		if (!(obj instanceof ButtonEvent))
 			return false;
-		TouchEvent other = (TouchEvent) obj;
+		ButtonEvent other = (ButtonEvent) obj;
 		if (buttonId != other.buttonId)
 			return false;
 		if (direction != other.direction)

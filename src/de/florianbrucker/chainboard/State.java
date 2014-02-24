@@ -14,7 +14,7 @@ public class State {
 		return id;
 	}
 	
-	public State transition(TouchEvent e) {
+	public State transition(ButtonEvent e) {
 		return new State(id + Integer.toString(e.buttonId));
 	}
 	
