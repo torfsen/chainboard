@@ -1,0 +1,11 @@
+# Some simple numbers
+00 "1"
+22 "2"
+44 "3"
+66 "4"
+
+# Some simple cursor movements
+11 DPAD_UP
+33 DPAD_DOWN
+55 DPAD_LEFT
+77 DPAD_RIGHT
