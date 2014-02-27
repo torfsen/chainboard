@@ -66,11 +66,7 @@ public class TransitionTable implements TransitionFunction {
 	
 	void put(String oldId, String newId, int keyCode) {
 		table.put(new State(oldId), new KeyCodeValue(new State(newId), keyCode));
-	}
-	
-	void insertString(String s) {
-		
-	}
+	}	
 	
 
 	@Override
