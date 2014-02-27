@@ -5,41 +5,73 @@ import java.util.Map;
 
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
+import android.widget.EditText;
 import de.florianbrucker.chainboard.StateMachine.TransitionFunction;
 
 public class TransitionTable implements TransitionFunction {	
 	
 	final static String TAG = "TransitionTable";
 	
-	class Value {
+	abstract class Value {
 		final State state;
+		
+		public Value(State state) {
+			this.state = state;
+		}
+		
+		public abstract void performAction();
+	}
+	
+	class StringValue extends Value {
+		final String string;				
+		
+		public StringValue(State state, String string) {
+			super(state);
+			this.string = string;
+		}
+		
+		public void performAction() {
+			edit.getText().insert(edit.getSelectionStart(), string);
+		}
+	}
+	
+	class KeyCodeValue extends Value {
 		final int keyCode;
 		
-		public Value(State state, int keyCode) {
-			this.state = state;
+		public KeyCodeValue(State state, int keyCode) {
+			super(state);
 			this.keyCode = keyCode;
+		}
+		
+		public void performAction() {
+			edit.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, keyCode));
+			edit.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, keyCode));
 		}
 	}
 	
 	Map<State, Value> table = new HashMap<State, Value>();
 	
-	View view;
+	EditText edit;
 	
-	public TransitionTable(View view) {
-		this.view = view;
-		put("00", "", KeyEvent.KEYCODE_1);
-		put("11", "", KeyEvent.KEYCODE_2);
+	public TransitionTable(EditText edit) {
+		this.edit = edit;
+		put("00", "", "1");
+		put("22", "", "2");
+		put("11", "", KeyEvent.KEYCODE_DEL);
+	}
+	
+	void put(String oldId, String newId, String s) {
+		table.put(new State(oldId), new StringValue(new State(newId), s));
 	}
 	
 	void put(String oldId, String newId, int keyCode) {
-		table.put(new State(oldId), new Value(new State(newId), keyCode));
+		table.put(new State(oldId), new KeyCodeValue(new State(newId), keyCode));
 	}
 	
-	void pressKey(int code) {
-		view.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, code));
-		view.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, code));
+	void insertString(String s) {
+		
 	}
+	
 
 	@Override
 	public State transition(State state) {
@@ -52,7 +84,7 @@ public class TransitionTable implements TransitionFunction {
 			return state;
 		}
 		Value value = table.get(state);
-		pressKey(value.keyCode);
+		value.performAction();
 		return value.state;
 	}
 
