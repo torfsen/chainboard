@@ -22,7 +22,7 @@ public class MainActivity extends Activity {
 		TouchBar leftBar = (TouchBar)findViewById(R.id.leftBar);
 		TouchBar rightBar = (TouchBar)findViewById(R.id.rightBar);
 
-		MotionEventCollector collector = new MotionEventCollector(4);
+		MotionEventCollector collector = new MotionEventCollector(ChainBoard.BUTTONS_PER_BOARD);
 		leftBar.setOnTouchListener(collector);
 		rightBar.setOnTouchListener(collector);
 		collector.addButtonEventListener(machine);

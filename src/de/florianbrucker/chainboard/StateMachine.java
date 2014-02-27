@@ -7,7 +7,7 @@ public class StateMachine implements ButtonEventListener {
 	final static String TAG = "StateMachine";
 	
 	public interface TransitionFunction {
-		public State transition(State oldState, ButtonEvent event);
+		public State transition(State state);
 	}
 	
 	TransitionFunction transitionFunction = null;
@@ -27,8 +27,10 @@ public class StateMachine implements ButtonEventListener {
 	@Override
 	public void onButtonEvent(ButtonEvent e) {
 		Log.d(TAG, "Received ButtonEvent " + e);
-		Log.d(TAG, "Current state is " + state);
-		state = transitionFunction.transition(state, e);
+		Log.d(TAG, "Old state is " + state);
+		state = state.transition(e);
+		Log.d(TAG, "State after button event is " + state);
+		state = transitionFunction.transition(state);
 		Log.d(TAG, "New state is " + state);
 	}
 }

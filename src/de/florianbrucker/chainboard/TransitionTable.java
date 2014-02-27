@@ -3,63 +3,14 @@ package de.florianbrucker.chainboard;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import de.florianbrucker.chainboard.StateMachine.TransitionFunction;
 
-public class TransitionTable implements TransitionFunction {
+public class TransitionTable implements TransitionFunction {	
 	
-	class Key {
-		final State state;
-		final int buttonId;
-		
-		public Key(State state, int buttonId) {
-			this.state = state;
-			this.buttonId = buttonId;
-		}
-
-		private TransitionTable getOuterType() {
-			return TransitionTable.this;
-		}
-		
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getOuterType().hashCode();
-			result = prime * result + buttonId;
-			result = prime * result + ((state == null) ? 0 : state.hashCode());
-			return result;
-		}
-		
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj) {
-				return true;
-			}
-			if (obj == null) {
-				return false;
-			}
-			if (!(obj instanceof Key)) {
-				return false;
-			}
-			Key other = (Key) obj;
-			if (!getOuterType().equals(other.getOuterType())) {
-				return false;
-			}
-			if (buttonId != other.buttonId) {
-				return false;
-			}
-			if (state == null) {
-				if (other.state != null) {
-					return false;
-				}
-			} else if (!state.equals(other.state)) {
-				return false;
-			}
-			return true;
-		}
-	}
+	final static String TAG = "TransitionTable";
 	
 	class Value {
 		final State state;
@@ -71,19 +22,18 @@ public class TransitionTable implements TransitionFunction {
 		}
 	}
 	
-	Map<Key, Value> table = new HashMap<Key, Value>();
+	Map<State, Value> table = new HashMap<State, Value>();
 	
 	View view;
 	
 	public TransitionTable(View view) {
 		this.view = view;
-		
-		put("", 1, "1", KeyEvent.KEYCODE_1);
-		put("1", 1, "", KeyEvent.KEYCODE_2);
+		put("00", "", KeyEvent.KEYCODE_1);
+		put("11", "", KeyEvent.KEYCODE_2);
 	}
 	
-	void put(String oldId, int buttonId, String newId, int keyCode) {
-		table.put(new Key(new State(oldId), buttonId), new Value(new State(newId), keyCode));
+	void put(String oldId, String newId, int keyCode) {
+		table.put(new State(oldId), new Value(new State(newId), keyCode));
 	}
 	
 	void pressKey(int code) {
@@ -92,13 +42,16 @@ public class TransitionTable implements TransitionFunction {
 	}
 
 	@Override
-	public State transition(State oldState, ButtonEvent event) {
-		Key key = new Key(oldState, event.buttonId);
-		if (!table.containsKey(key)) {
-			pressKey(KeyEvent.KEYCODE_ENTER);
-			return State.NULL_STATE;
+	public State transition(State state) {
+		if (!table.containsKey(state)) {
+			if (state.getNumberOfPressedButtons() == 0) {
+				Log.d(TAG, "Reached unset dead-end state " + state);
+				// TODO: Notify the user about reaching an unset dead-end state
+				return State.NULL_STATE;
+			}
+			return state;
 		}
-		Value value = table.get(key);
+		Value value = table.get(state);
 		pressKey(value.keyCode);
 		return value.state;
 	}

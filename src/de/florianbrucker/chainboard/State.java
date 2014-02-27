@@ -47,6 +47,23 @@ public class State {
 		}
 		return true;
 	}
+	
+	
+	public int getNumberOfPressedButtons() {
+		boolean isDown[] = new boolean[2 * ChainBoard.BUTTONS_PER_BOARD];
+		for (int i = 0; i < id.length(); i++) {
+			int key = id.charAt(i) - '0';
+			isDown[key] = !isDown[key];
+		}
+		int numDown = 0;
+		for (int i = 0; i < isDown.length; i++) {
+			if (isDown[i]) {
+				numDown++;
+			}
+		}
+		return numDown;
+	}
+	
 
 	@Override
 	public State clone() {
