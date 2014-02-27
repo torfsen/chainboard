@@ -1,7 +1,12 @@
 package de.florianbrucker.chainboard;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import android.util.Log;
 import android.view.KeyEvent;
@@ -55,9 +60,47 @@ public class TransitionTable implements TransitionFunction {
 	
 	public TransitionTable(EditText edit) {
 		this.edit = edit;
-		put("00", "", "1");
-		put("22", "", "2");
-		put("11", "", KeyEvent.KEYCODE_DEL);
+	}
+	
+	public void loadFromFile(BufferedReader reader) throws IOException {
+		Pattern pattern = Pattern.compile("(\\d+)\\s+(\\w+|\".*\"|'.*')(?:\\s+(\\d+))?");
+		String line;
+		int lineNumber = 0;
+		while ((line = reader.readLine()) != null) {
+			lineNumber++;
+			line = line.trim();
+			if (line.length() == 0 || line.startsWith("#")) {
+				continue;
+			}
+			Matcher matcher = pattern.matcher(line);
+			if (!matcher.matches()) {
+				throw new IllegalArgumentException("Could not parse line " + lineNumber + ": Illegal format.");
+			}
+			String oldId = matcher.group(1);
+			String action = matcher.group(2);
+			String newId = matcher.group(3);
+			if (newId == null) {
+				newId = "";
+			}
+			if (action.startsWith("\"") || action.startsWith("'")) {
+				String string = action.substring(1, action.length() - 1);
+				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + newId + " " + string);
+				put(oldId, newId, string);
+			} else {
+				String fieldName = "KEYCODE_" + action;
+				int keyCode;
+				try {
+					Field field = KeyEvent.class.getDeclaredField(fieldName);
+					keyCode = field.getInt(null);
+				} catch (NoSuchFieldException e) {
+					throw new IllegalArgumentException("Invalid keycode \"" + action + "\" on line " + lineNumber + ".");
+				} catch (IllegalAccessException e) {
+					throw new IllegalArgumentException("Invalid keycode \"" + action + "\" on line " + lineNumber + ".");
+				}
+				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + newId + " " + keyCode);
+				put(oldId, newId, keyCode);
+			}
+		}
 	}
 	
 	void put(String oldId, String newId, String s) {

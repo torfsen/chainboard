@@ -53,6 +53,9 @@ public class State {
 		boolean isDown[] = new boolean[2 * ChainBoard.BUTTONS_PER_BOARD];
 		for (int i = 0; i < id.length(); i++) {
 			int key = id.charAt(i) - '0';
+			if (key < 0 || key >= isDown.length) {
+				throw new IllegalArgumentException("Invalid state ID character \"" + id.charAt(i) + "\" in ID \"" + id + "\".");
+			}
 			isDown[key] = !isDown[key];
 		}
 		int numDown = 0;
