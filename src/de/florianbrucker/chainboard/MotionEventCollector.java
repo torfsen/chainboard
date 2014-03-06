@@ -1,5 +1,6 @@
 package de.florianbrucker.chainboard;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 import android.util.Log;
@@ -14,6 +15,8 @@ public class MotionEventCollector implements OnTouchListener {
 	Collection<ButtonEventListener> listeners = new java.util.LinkedList<ButtonEventListener>();
 	
 	int buttonCount = 0;
+	
+	ArrayList<Integer> pointerButtons = new ArrayList<Integer>();
 	
 	public void addButtonEventListener(ButtonEventListener listener) {
 		listeners.add(listener);
@@ -31,6 +34,11 @@ public class MotionEventCollector implements OnTouchListener {
 	
 	public MotionEventCollector(int buttonCount) {
 		this.buttonCount = buttonCount;
+		
+		// People with more than 10 fingers may cause an IndexOutOfBoundsException...
+		for (int i = 0; i < 10; i++) {
+			pointerButtons.add(-1);
+		}
 	}
 	
 	@Override
@@ -50,29 +58,40 @@ public class MotionEventCollector implements OnTouchListener {
 		}
 		
 		int index = event.getActionIndex();
-		float buttonHeight = v.getHeight() / buttonCount;				
-		int buttonRow = (int)(event.getY(index) / buttonHeight);
+		int pointerId = event.getPointerId(index);
+		int buttonId;
 		
-		/*
-		 * It is possible to click below the lowest button. To avoid
-		 * illegal button IDs we clamp the button row to the correct
-		 * range.
-		 */
-		buttonRow = Math.min(ChainBoard.BUTTONS_PER_BOARD - 1, Math.max(buttonRow, 0));
+		if (direction == ButtonEvent.Direction.DOWN) { 
+			float buttonHeight = v.getHeight() / buttonCount;				
+			int buttonRow = (int)(event.getY(index) / buttonHeight);
+			
+			/*
+			 * It is possible to click below the lowest button. To avoid
+			 * illegal button IDs we clamp the button row to the correct
+			 * range.
+			 */
+			buttonRow = Math.min(ChainBoard.BUTTONS_PER_BOARD - 1, Math.max(buttonRow, 0));
+			
+			/*
+			 * Android reports actions from the second pointer w.r.t.
+			 * the view of the first pointer. This means we need to
+			 * compare the pointer locations to the view geometries
+			 * to figure out in which view the pointer actually is.
+			 */
+			float x = event.getX(index) + v.getLeft();
+			int buttonColumn = x > v.getWidth() ? 1 : 0;
+			buttonId = buttonColumn + 2 * buttonRow;
+			
+			pointerButtons.set(pointerId, buttonId);
+		} else {
+			/*
+			 * For UP events we cannot use the pointer position because the
+			 * pointer could have been dragged to another button.
+			 */
+			buttonId = pointerButtons.get(pointerId);
+		}
 		
-		/*
-		 * Android reports actions from the second pointer w.r.t.
-		 * the view of the first pointer. This means we need to
-		 * compare the pointer locations to the view geometries
-		 * to figure out in which view the pointer actually is.
-		 */
-		float x = event.getX(index) + v.getLeft();
-		int buttonColumn = x > v.getWidth() ? 1 : 0;
-		int buttonId = buttonColumn + 2 * buttonRow;
-		
-		
-		
-		Log.d(TAG, buttonId + " " + direction + " " + x);
+		Log.d(TAG, buttonId + " " + direction);
 		
 		fireEvent(new ButtonEvent(buttonId, direction));
 		
