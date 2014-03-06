@@ -54,14 +54,23 @@ public class MotionEventCollector implements OnTouchListener {
 		int buttonRow = (int)(event.getY(index) / buttonHeight);
 		
 		/*
+		 * It is possible to click below the lowest button. To avoid
+		 * illegal button IDs we clamp the button row to the correct
+		 * range.
+		 */
+		buttonRow = Math.min(ChainBoard.BUTTONS_PER_BOARD - 1, Math.max(buttonRow, 0));
+		
+		/*
 		 * Android reports actions from the second pointer w.r.t.
 		 * the view of the first pointer. This means we need to
 		 * compare the pointer locations to the view geometries
 		 * to figure out in which view the pointer actually is.
 		 */
-		float x = event.getX(index) + v.getLeft();		
+		float x = event.getX(index) + v.getLeft();
 		int buttonColumn = x > v.getWidth() ? 1 : 0;
 		int buttonId = buttonColumn + 2 * buttonRow;
+		
+		
 		
 		Log.d(TAG, buttonId + " " + direction + " " + x);
 		
