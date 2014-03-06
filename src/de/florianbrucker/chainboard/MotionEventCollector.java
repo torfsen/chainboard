@@ -14,8 +14,6 @@ public class MotionEventCollector implements OnTouchListener {
 	
 	Collection<ButtonEventListener> listeners = new java.util.LinkedList<ButtonEventListener>();
 	
-	int buttonCount = 0;
-	
 	ArrayList<Integer> pointerButtons = new ArrayList<Integer>();
 	
 	public void addButtonEventListener(ButtonEventListener listener) {
@@ -32,8 +30,7 @@ public class MotionEventCollector implements OnTouchListener {
 		}
 	}
 	
-	public MotionEventCollector(int buttonCount) {
-		this.buttonCount = buttonCount;
+	public MotionEventCollector() {
 		
 		// People with more than 10 fingers may cause an IndexOutOfBoundsException...
 		for (int i = 0; i < 10; i++) {
@@ -62,7 +59,7 @@ public class MotionEventCollector implements OnTouchListener {
 		int buttonId;
 		
 		if (direction == ButtonEvent.Direction.DOWN) { 
-			float buttonHeight = v.getHeight() / buttonCount;				
+			float buttonHeight = v.getHeight() / ChainBoard.BUTTONS_PER_BOARD;				
 			int buttonRow = (int)(event.getY(index) / buttonHeight);
 			
 			/*
