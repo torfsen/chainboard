@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,6 +73,7 @@ public class TransitionTable implements TransitionFunction {
 			if (line.length() == 0 || line.startsWith("#")) {
 				continue;
 			}
+			Log.d(TAG, "Parsing \"" + line + "\"");
 			Matcher matcher = pattern.matcher(line);
 			if (!matcher.matches()) {
 				throw new IllegalArgumentException("Could not parse line " + lineNumber + ": Illegal format.");
@@ -83,8 +85,8 @@ public class TransitionTable implements TransitionFunction {
 				newId = "";
 			}
 			if (action.startsWith("\"") || action.startsWith("'")) {
-				String string = action.substring(1, action.length() - 1);
-				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + newId + " " + string);
+				String string = String.format(Locale.US, action.substring(1, action.length() - 1));
+				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + string + " " + newId);
 				put(oldId, newId, string);
 			} else {
 				String fieldName = "KEYCODE_" + action;
@@ -97,19 +99,30 @@ public class TransitionTable implements TransitionFunction {
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException("Invalid keycode \"" + action + "\" on line " + lineNumber + ".");
 				}
-				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + newId + " " + keyCode);
+				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + keyCode + " " + newId);
 				put(oldId, newId, keyCode);
 			}
 		}
 	}
 	
+	
 	void put(String oldId, String newId, String s) {
-		table.put(new State(oldId), new StringValue(new State(newId), s));
+		State oldState = new State(oldId);
+		State newState = new State(newId);
+		if (!newState.isCompatibleWith(oldState)) {
+			throw new IllegalTransitionException(oldState, newState);
+		}
+		table.put(oldState, new StringValue(newState, s));
 	}
 	
 	void put(String oldId, String newId, int keyCode) {
-		table.put(new State(oldId), new KeyCodeValue(new State(newId), keyCode));
-	}	
+		State oldState = new State(oldId);
+		State newState = new State(newId);
+		if (!newState.isCompatibleWith(oldState)) {
+			throw new IllegalTransitionException(oldState, newState);
+		}
+		table.put(oldState, new KeyCodeValue(newState, keyCode));
+	}
 	
 
 	@Override

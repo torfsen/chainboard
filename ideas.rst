@@ -55,10 +55,10 @@ A similar mechanism is used for the larger cursor movements ``PGUP`` and
 ``PGDOWN``, as well as for the pseudo-cursor movements ``BACKSPACE`` and
 ``DEL``::
 
-    6166 --[PGUP     ]--> 6
-    6366 --[PGDOWN   ]--> 6
-    6566 --[BACKSPACE]--> 6
-    6766 --[DEL      ]--> 6
+    6166 --[PGUP     ]--> 61
+    6366 --[PGDOWN   ]--> 63
+    6566 --[BACKSPACE]--> 65
+    6766 --[DEL      ]--> 67
 
 Here, the pattern is that a certain movement is selected by a combination of
 key 6 and a right-hand key. The movement is then triggered using a toggle of
@@ -123,7 +123,4 @@ TODO
 
 * The keys ``HOME``/``POS1`` and ``END``
 * A usage for the short sequences ``00``, ``11``, ..., ``77``
-* Idea: State notations can be compressed by implicitly releasing a pressed key
-  on the same side as the key that is to be pressed next. For example, ``0113``
-  can be denoted as ``013`` without loss of information if the restriction holds
-  that only one key per side can be pressed at any time.
+* Idea: Use a compose-key approach for umlauts, etc.

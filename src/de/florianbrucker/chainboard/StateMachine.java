@@ -28,9 +28,13 @@ public class StateMachine implements ButtonEventListener {
 	public void onButtonEvent(ButtonEvent e) {
 		Log.d(TAG, "Received ButtonEvent " + e);
 		Log.d(TAG, "Old state is " + state);
-		state = state.transition(e);
+		State newState = state.transition(e);
+		state = newState;
 		Log.d(TAG, "State after button event is " + state);
 		state = transitionFunction.transition(state);
+		if (!newState.isCompatibleWith(state)) {
+			throw new IllegalTransitionException(state, newState);
+		}
 		Log.d(TAG, "New state is " + state);
 	}
 }
