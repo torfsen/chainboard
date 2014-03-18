@@ -18,6 +18,8 @@ public class TransitionTable implements TransitionFunction {
 	
 	final static String TAG = "TransitionTable";
 	
+	StatePool statePool;
+	
 	abstract class Value {
 		final State state;
 		
@@ -59,7 +61,8 @@ public class TransitionTable implements TransitionFunction {
 	
 	EditText edit;
 	
-	public TransitionTable(EditText edit) {
+	public TransitionTable(StatePool statePool, EditText edit) {
+		this.statePool = statePool;
 		this.edit = edit;
 	}
 	
@@ -73,7 +76,6 @@ public class TransitionTable implements TransitionFunction {
 			if (line.length() == 0 || line.startsWith("#")) {
 				continue;
 			}
-			Log.d(TAG, "Parsing \"" + line + "\"");
 			Matcher matcher = pattern.matcher(line);
 			if (!matcher.matches()) {
 				throw new IllegalArgumentException("Could not parse line " + lineNumber + ": Illegal format.");
@@ -86,7 +88,6 @@ public class TransitionTable implements TransitionFunction {
 			}
 			if (action.startsWith("\"") || action.startsWith("'")) {
 				String string = String.format(Locale.US, action.substring(1, action.length() - 1));
-				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + string + " " + newId);
 				put(oldId, newId, string);
 			} else {
 				String fieldName = "KEYCODE_" + action;
@@ -99,7 +100,6 @@ public class TransitionTable implements TransitionFunction {
 				} catch (IllegalAccessException e) {
 					throw new IllegalArgumentException("Invalid keycode \"" + action + "\" on line " + lineNumber + ".");
 				}
-				Log.d(TAG, "Parsed (" + line + ") into " + oldId + " " + keyCode + " " + newId);
 				put(oldId, newId, keyCode);
 			}
 		}
@@ -107,17 +107,18 @@ public class TransitionTable implements TransitionFunction {
 	
 	
 	void put(String oldId, String newId, String s) {
-		State oldState = new State(oldId);
-		State newState = new State(newId);
+		State oldState = statePool.getState(oldId);
+		State newState = statePool.getState(newId);
 		if (!newState.isCompatibleWith(oldState)) {
 			throw new IllegalTransitionException(oldState, newState);
 		}
 		table.put(oldState, new StringValue(newState, s));
 	}
 	
+	
 	void put(String oldId, String newId, int keyCode) {
-		State oldState = new State(oldId);
-		State newState = new State(newId);
+		State oldState = statePool.getState(oldId);
+		State newState = statePool.getState(newId);
 		if (!newState.isCompatibleWith(oldState)) {
 			throw new IllegalTransitionException(oldState, newState);
 		}
@@ -131,7 +132,7 @@ public class TransitionTable implements TransitionFunction {
 			if (state.getNumberOfPressedButtons() == 0) {
 				Log.d(TAG, "Reached unset dead-end state " + state);
 				// TODO: Notify the user about reaching an unset dead-end state
-				return State.NULL_STATE;
+				return statePool.NULL_STATE;
 			}
 			return state;
 		}

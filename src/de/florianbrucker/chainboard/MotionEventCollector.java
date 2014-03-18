@@ -3,7 +3,6 @@ package de.florianbrucker.chainboard;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -87,8 +86,6 @@ public class MotionEventCollector implements OnTouchListener {
 			 */
 			buttonId = pointerButtons.get(pointerId);
 		}
-		
-		Log.d(TAG, buttonId + " " + direction);
 		
 		fireEvent(new ButtonEvent(buttonId, direction));
 		

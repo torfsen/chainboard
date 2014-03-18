@@ -1,5 +1,9 @@
 package de.florianbrucker.chainboard;
 
+
+import java.util.LinkedList;
+import java.util.List;
+
 import android.util.Log;
 
 public class StateMachine implements ButtonEventListener {
@@ -10,31 +14,50 @@ public class StateMachine implements ButtonEventListener {
 		public State transition(State state);
 	}
 	
+	
+	public interface StateChangeListener {
+		public void onStateChange(State oldState, State newState);
+	}
+	
+	List<StateChangeListener> stateChangeListeners = new LinkedList<StateChangeListener>();
+	
+	public void addStateChangeListener(StateChangeListener listener) {
+		stateChangeListeners.add(listener);
+	}
+	
+	public void removeStateChangeListener(StateChangeListener listener) {
+		stateChangeListeners.remove(listener);
+	}
+	
+	void fireStateChangeEvent(State oldState, State newState) {
+		for (StateChangeListener listener : stateChangeListeners) {
+			listener.onStateChange(oldState, newState);
+		}
+	}
+	
 	TransitionFunction transitionFunction = null;
 	
-	State state = null;
+	private State state;
 	
-	public StateMachine(TransitionFunction transitionFunction, State state) {
+	public State getState() {
+		return state;
+	}
+	
+	public StateMachine(State state, TransitionFunction transitionFunction) {
 		this.transitionFunction = transitionFunction;
 		this.state = state;
 	}
 	
-	public StateMachine(TransitionFunction transitionFunction) {
-		this.transitionFunction = transitionFunction;
-		this.state = State.NULL_STATE;
-	}
-	
 	@Override
 	public void onButtonEvent(ButtonEvent e) {
-		Log.d(TAG, "Received ButtonEvent " + e);
-		Log.d(TAG, "Old state is " + state);
-		State newState = state.transition(e);
-		state = newState;
-		Log.d(TAG, "State after button event is " + state);
-		state = transitionFunction.transition(state);
-		if (!newState.isCompatibleWith(state)) {
-			throw new IllegalTransitionException(state, newState);
+		State oldState = state;
+		State intermediateState = state.transition(e);
+		state = transitionFunction.transition(intermediateState);
+		if (!state.isCompatibleWith(intermediateState)) {
+			throw new IllegalTransitionException(intermediateState, state);
 		}
-		Log.d(TAG, "New state is " + state);
+		Log.d(TAG, "State transition: " + oldState + " --[" + intermediateState + "]--> " + state);
+		fireStateChangeEvent(oldState, state);
 	}
+	
 }

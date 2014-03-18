@@ -4,4 +4,5 @@
 	android:background="@drawable/button_default"
 	android:textSize="17sp"
 	android:gravity="center"
+	android:padding="5sp"
 />

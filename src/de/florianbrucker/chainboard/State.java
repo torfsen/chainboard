@@ -1,17 +1,19 @@
 package de.florianbrucker.chainboard;
 
-import android.util.Log;
 
-public class State {
+public class State {	
 	
-	final static String TAG = "STATE";
-	
-	final static State NULL_STATE = new State("");
+	final static String TAG = "STATE";	
 	
 	final String id;
 	
-	public State(String id) {
+	final StatePool pool;
+	
+	String[] labels = new String[2 * ChainBoard.BUTTONS_PER_BOARD];
+	
+	public State(StatePool pool, String id) {
 		this.id = decompressId(id);
+		this.pool = pool;
 	}
 	
 	public String getId() {
@@ -19,7 +21,7 @@ public class State {
 	}
 	
 	public State transition(ButtonEvent e) {
-		return new State(id + Integer.toString(e.buttonId));
+		return pool.getState(id + Integer.toString(e.buttonId));
 	}
 	
 	@Override
@@ -90,11 +92,6 @@ public class State {
 	}
 	
 	@Override
-	public State clone() {
-		return new State(id);
-	}
-	
-	@Override
 	public String toString() {
 		return "State(" + id + ")";
 	}
@@ -124,7 +121,8 @@ public class State {
 				throw new IllegalArgumentException("State \"" + id + "\" is not connected.");
 			}
 		}
-		Log.d(TAG, "decompressId(" + id + ") = " + builder.toString());
 		return builder.toString();
 	}
+	
+	
 }
